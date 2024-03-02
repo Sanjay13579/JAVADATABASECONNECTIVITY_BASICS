@@ -1,0 +1,159 @@
+package jdbc.bus;
+import java.sql.*;
+import java.util.Scanner;
+public class JdbcDemo {
+	private static String name;
+	private static Integer salary;
+	public static void main(String[] args) throws SQLException  {
+		    //insertRecord();
+			//readRecord();
+			//insertusingpstRecord();
+		    //readuser();
+		     //delete();
+		     //drop();
+		     //update();
+			//storedprocudre();		
+		     //storedprocudrewithparam();
+		     storedprocudrewithoutparam();
+	} 
+	private static void storedprocudrewithoutparam() throws SQLException{
+		String url = "jdbc:mysql://localhost:3306/jdbcdemo";
+		String userName = "root";
+		String passWord = "nivisan";
+		Integer id = 2;
+		Connection con = DriverManager.getConnection(url, userName, passWord);
+		CallableStatement pcb = con.prepareCall("{call getempbyout(?,?)}");
+		pcb.setInt(1, id);
+		pcb.registerOutParameter(2, Types.VARCHAR);
+		pcb.executeUpdate();
+		System.out.println("output is "+pcb.getString(2));
+		con.close();
+	}
+	private static void storedprocudrewithparam() throws SQLException{
+		String url = "jdbc:mysql://localhost:3306/jdbcdemo";
+		String userName = "root";
+		String passWord = "nivisan";
+		Integer id = 2;
+		Connection con = DriverManager.getConnection(url, userName, passWord);
+		CallableStatement cst =  con.prepareCall("{call getempbyid(?)}");
+		cst.setInt(1, id);
+		ResultSet rs = cst.executeQuery();
+		rs.next();
+		System.out.println("name is " + rs.getString(1));
+		
+	}
+	private static void storedprocudre() throws SQLException{
+		String url = "jdbc:mysql://localhost:3306/jdbcdemo";
+		String userName = "root";
+		String passWord = "nivisan";
+		Connection con = DriverManager.getConnection(url, userName, passWord);
+		CallableStatement cst =  con.prepareCall("{call simplecall()}");
+		ResultSet rs = cst.executeQuery();
+		while(rs.next()) {
+		    System.out.println("id="+ rs.getInt(1));
+		    System.out.println("Name="+ rs.getString(2));
+		    System.out.println("salary="+ rs.getInt(3));
+		}
+		con.close();
+	}
+	
+	private static void update() throws SQLException {
+		String url="jdbc:mySql://localhost:3306/jdbcdemo";
+		String userName="root";    
+		String passWord="nivisan";	
+		String query= "update employee set salary=150000000 where emp_id=2";
+		Connection con= DriverManager.getConnection(url,userName,passWord);
+		Statement st= con.createStatement();
+	    int rows = st.executeUpdate(query);
+	    System.out.println("rows affected "+rows);
+	    con.close();
+		
+	}
+	private static void drop() throws SQLException {
+		String url="jdbc:mySql://localhost:3306/jdbcdemo";
+		String userName="root";    
+		String passWord="nivisan";	
+		String query= "drop table employee";
+		Connection con= DriverManager.getConnection(url,userName,passWord);
+		Statement st= con.createStatement();
+	    int rows = st.executeUpdate(query);
+	    System.out.println("rows deleted"+rows);
+	    con.close();
+		
+	}
+	private static void delete() throws SQLException {
+		String url="jdbc:mySql://localhost:3306/jdbcdemo";
+		String userName="root";    
+		String passWord="nivisan";	
+		String query= "delete from  employee where ename='sanjay'";
+		Connection con= DriverManager.getConnection(url,userName,passWord);
+		Statement st= con.createStatement();
+	    int rows = st.executeUpdate(query);
+	    System.out.println("rows deleted"+rows);
+	    con.close();
+		
+	}
+	private static void readuser() throws SQLException {
+		Scanner obj = new Scanner(System.in);
+		 name = obj.next();
+         salary = obj.nextInt();
+		insertusingpstRecord();
+		readRecord();
+		
+	}
+	public static void readRecord() throws SQLException
+	{
+		String url="jdbc:mySql://localhost:3306/jdbcdemo";
+		String userName="root";    
+		String passWord="nivisan";	
+		String query= "select*from employee";
+		Connection con= DriverManager.getConnection(url,userName,passWord);
+		Statement st= con.createStatement();
+		ResultSet rs= st.executeQuery(query);
+		
+		while(rs.next()) {
+		    System.out.println("id="+ rs.getInt(1));
+		    System.out.println("Name="+ rs.getString(2));
+		    System.out.println("salary="+ rs.getInt(3));
+		}
+		con.close();
+	}
+	/*public static void insertRecord() throws SQLException
+	{
+		String url="jdbc:mySql://localhost:3306/jdbcdemo";
+		String userName="root";
+		String passWord="nivisan";
+		name = "sanjay";
+		salary = 500000;
+		
+		
+					//insert into employee (ename,salary) values('priya',500000);
+		String query= "insert into employee (ename,salary) values ('"+name+ "'," +salary+");";
+		//String query= "insert into employee (ename,salary) values ('nivimaadu',5000000)";
+
+		Connection con= DriverManager.getConnection(url,userName,passWord);
+		Statement st= con.createStatement();
+		int rows = st.executeUpdate(query);
+		System.out.println("no of rows affected "+rows);
+		con.close(); 
+	}*/
+	
+	
+	public static void insertusingpstRecord() throws SQLException
+	{
+		String url="jdbc:mySql://localhost:3306/jdbcdemo";
+		String userName="root";
+		String passWord="nivisan";
+		//String name = "sanjay";
+		//int  salary = 500000;
+		String query = "insert into employee (ename,salary) values(?,?)";
+		Connection con= DriverManager.getConnection(url,userName,passWord);
+		PreparedStatement pst= con.prepareStatement(query);
+		pst.setString(1, name);
+		pst.setInt(2, salary);
+		int rows = pst.executeUpdate();
+		System.out.println("no of rows affected "+rows);
+		con.close(); 
+	}
+	
+}
